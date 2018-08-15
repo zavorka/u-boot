@@ -12,7 +12,25 @@
 
 #include "version.h"
 #include <linux/sizes.h>
-#include <asm/arch/prior_stage.h>
+
+#ifndef __ASSEMBLY__
+
+#include <linux/types.h>
+
+struct bcmstb_boot_parameters {
+	u32 r0;
+	u32 r1;
+	u32 r2;
+	u32 r3;
+	u32 sp;
+	u32 lr;
+};
+
+extern struct bcmstb_boot_parameters bcmstb_boot_parameters;
+
+extern phys_addr_t prior_stage_fdt_address;
+
+#endif /* __ASSEMBLY__ */
 
 /*
  * Generic board configuration.
@@ -69,16 +87,11 @@
  * MiB.  However, BOLT can be configured to allow loading larger
  * initramfs images, in which case this limitation is eliminated.
  */
-#define CONFIG_NR_DRAM_BANKS		3
-
 #define CONFIG_SYS_SDRAM_BASE		0x00000000
-#define CONFIG_SYS_TEXT_BASE		0x80100000
-#define CONFIG_SYS_INIT_RAM_ADDR	0x80200000
 #define CONFIG_SYS_INIT_RAM_SIZE	0x100000
 #define CONFIG_SYS_INIT_SP_ADDR		(CONFIG_SYS_INIT_RAM_ADDR +	\
 					 CONFIG_SYS_INIT_RAM_SIZE -	\
 					 GENERATED_GBL_DATA_SIZE)
-#define CONFIG_SYS_MALLOC_LEN		((10 * 1024) << 10) /* 10 MiB */
 #define CONFIG_SYS_LOAD_ADDR		0x2000000
 
 /*
@@ -123,9 +136,6 @@
 #define CONFIG_CMD_ASKENV
 #define CONFIG_CMD_CACHE
 #define CONFIG_CMD_EXT2
-#define CONFIG_CMD_SF
-#define CONFIG_CMD_SPI
-#define CONFIG_CMD_SF_TEST
 #define CONFIG_CMD_MMC
 
 /*
@@ -148,7 +158,6 @@
  */
 #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
 
-#define CONFIG_ENV_IS_IN_SPI_FLASH      1
 #define CONFIG_ENV_OFFSET		0x1e0000
 #define CONFIG_ENV_SIZE			(64 << 10) /* 64 KiB */
 #define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
@@ -175,9 +184,5 @@
  * writeable environment is available.
  */
 #define CONFIG_BOARD_LATE_INIT
-
-#define CONFIG_SYS_MAX_FLASH_BANKS 1
-
-#define CONFIG_DM_SPI 1
 
 #endif /* __BCMSTB_H */
